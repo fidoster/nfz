@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { v4 as uuidv4 } from "uuid";
+
 
 const Function = () => {
   const [pilots, setPilots] = useState([]);
@@ -13,9 +16,13 @@ const Function = () => {
 
       // Fetch the latest snapshot of drone positions
       const xml = await axios.get(dronesEndpoint);
-          console.log("Data from Drone Endpoint:", xml.data); // added this for testing
-        
-        // Iterate over the drones in the snapshot
+      console.log("Data from Drone Endpoint:", xml.data); // added this
+
+      // Parse the XML data
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xml.data, "text/xml");
+
+      // Iterate over the drones in the snapshot
       const drones = xmlDoc.getElementsByTagName("drone");
       for (const drone of drones) {
         // Get the serial number and position of the drone
@@ -27,17 +34,7 @@ const Function = () => {
         const y = parseFloat(
           drone.getElementsByTagName("positionY")[0].textContent
         );
-        // Fetch the latest snapshot of drone positions
-      const xml = await axios.get(dronesEndpoint);
-      console.log("Data from Drone Endpoint:", xml.data); // added this
 
-      // Parse the XML data
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xml.data, "text/xml");
-
-      // Iterate over the drones in the snapshot
-      const drones = xmlDoc.getElementsByTagName("drone");
-      for (const drone of drones) {
         // Calculate the distance from the nest
         const distance = Math.sqrt((x - 250000) ** 2 + (y - 250000) ** 2);
         console.log(distance);
@@ -53,3 +50,31 @@ const Function = () => {
     return () => clearInterval(intervalId);
   }, []);
   return (
+    <div className="container">
+      <table className="table table-striped table-dark table-responsive">
+        <thead>
+          <tr>
+            <th className="text-center">First Name</th>
+            <th className="text-center">Last Name</th>
+            <th className="text-center">Email</th>
+            <th className="text-center">Phone</th>
+            <th className="text-center">Distance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pilots.map((pilot) => (
+              <tr key={uuidv4()}>
+                <td className="text-center">{pilot.firstName}</td>
+                <td className="text-center">{pilot.lastName}</td>
+                <td className="text-center">{pilot.email}</td>
+                <td className="text-center">{pilot.phoneNumber}</td>
+                <td className="text-center">{pilot.distance.toFixed(2)}</td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+export default Function;
