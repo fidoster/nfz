@@ -1,9 +1,8 @@
-import './App.css';
+import React from "react";
+import Function from "./Function";
 
-function App() {
-  return (
-    <h1>Hello World</h1>
-  );
-}
+const App = () => {
+  return <Function />;
+};
 
 export default App;
